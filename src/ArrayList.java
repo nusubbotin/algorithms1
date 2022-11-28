@@ -1,107 +1,144 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class ArrayList implements StringList{
 
+    private final String[] stringArray;
+    private int size;
 
-    // Добавление элемента.
-    // Вернуть добавленный элемент
-    // в качестве результата выполнения.
-    public String add(String item){
-        return "";
+    public ArrayList() {
+        stringArray = new String[10];
     }
 
-    // Добавление элемента
-    // на определенную позицию списка.
-    // Если выходит за пределы фактического
-    // количества элементов или массива,
-    // выбросить исключение.
-    // Вернуть добавленный элемент
-    // в качестве результата выполнения.
-    public String add(int index, String item){
-        return "";
+    public ArrayList(int initSize) {
+        stringArray = new String[initSize];
     }
 
-    // Установить элемент
-    // на определенную позицию,
-    // затерев существующий.
-    // Выбросить исключение,
-    // если индекс больше
-    // фактического количества элементов
-    // или выходит за пределы массива.
-    public String set(int index, String item){
-        return "";
+    @Override
+    public String add(String item) {
+        validateSize();
+        validateValue(item);
+        stringArray[size++] = item;
+        return item;
     }
 
-    // Удаление элемента.
-    // Вернуть удаленный элемент
-    // или исключение, если подобный
-    // элемент отсутствует в списке.
-    public String remove(String item){
-        return "";
+    @Override
+    public String add(int index, String item) {
+        validateSize();
+        validateIndex(index);
+        validateValue(item);
+
+        if (index == size) {
+           stringArray[size++] = item;
+            return item;
+        }
+
+        System.arraycopy(stringArray, index, stringArray, index + 1, size - index);
+        stringArray[index] = item;
+        return item;
     }
 
-    // Удаление элемента по индексу.
-    // Вернуть удаленный элемент
-    // или исключение, если подобный
-    // элемент отсутствует в списке.
-    public String remove(int index){
-        return "";
+    @Override
+    public String set(int index, String item) {
+        validateIndex(index);
+        validateValue(item);
+        stringArray[index] = item;
+        return item;
     }
 
-    // Проверка на существование элемента.
-    // Вернуть true/false;
-    public boolean contains(String item){
-        return true;
+    @Override
+    public String remove(String item) {
+        validateValue(item);
+        int index = indexOf(item);
+        return remove(index);
     }
 
-    // Поиск элемента.
-    // Вернуть индекс элемента
-    // или -1 в случае отсутствия.
-    public int indexOf(String item){
+    @Override
+    public String remove(int index) {
+        validateIndex(index);
+
+        String item = stringArray[index];
+
+        if (index != size){
+            System.arraycopy(stringArray, index + 1, stringArray, index, size - index);
+        }
+
+        size--;
+        return item;
+    }
+
+    @Override
+    public boolean contains(String item) {
+        return indexOf(item) != -1;
+    }
+
+    @Override
+    public int indexOf(String item) {
+        for (int i = 0; i < size; i++) {
+            if (stringArray[i].equals(item)){
+                return 1;
+            }
+        }
         return -1;
     }
 
-    // Поиск элемента с конца.
-    // Вернуть индекс элемента
-    // или -1 в случае отсутствия.
-    public int lastIndexOf(String item){
+    @Override
+    public int lastIndexOf(String item) {
+        for (int i = size-1; i >= 0; i--) {
+            if (stringArray[i].equals(item)){
+                return 1;
+            }
+        }
         return -1;
     }
 
-    // Получить элемент по индексу.
-    // Вернуть элемент или исключение,
-    // если выходит за рамки фактического
-    // количества элементов.
-    public String get(int index){
-        return "";
+    @Override
+    public String get(int index) {
+        validateIndex(index);
+        return stringArray[index];
     }
 
-    // Сравнить текущий список с другим.
-    // Вернуть true/false или исключение,
-    // если передан null.
-    public boolean equals(StringList otherList){
-        return true;
+    @Override
+    public boolean equals(StringList otherList) {
+        return Arrays.equals(this.toArray(), otherList.toArray());
     }
 
-    // Вернуть фактическое количество элементов.
-    public int size(){
-        return 0;
+    @Override
+    public int size() {
+        return size;
     }
 
-    // Вернуть true,
-    // если элементов в списке нет,
-    // иначе false.
-    public boolean isEmpty(){
-        return true;
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
     }
 
-    // Удалить все элементы из списка.
-    public void clear(){
-
+    @Override
+    public void clear() {
+        size = 0;
     }
 
-    // Создать новый массив
-    // из строк в списке
-    // и вернуть его.
-    public String[] toArray(){
-        return new String[]{"1", "2"};
+    @Override
+    public String[] toArray() {
+        return Arrays.copyOf(stringArray, size);
     }
+
+    private void validateValue(String value){
+        if (value == null) {
+            throw new NullValueException();
+        }
+    }
+
+    private void validateSize(){
+        if (size >= stringArray.length){
+            throw new ArrayLengthExceptiom();
+        }
+    }
+
+    private void validateIndex(int index){
+        if (index < 0 || index > size){
+            throw new ArrayIndexException();
+        }
+    }
+
 }
